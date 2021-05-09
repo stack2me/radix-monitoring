@@ -1,0 +1,9 @@
+#nginx
+nginx_server_name: netdata.example.com
+nginx_auth_user: metrics
+nginx_auth_passw: S0mePassw0rd
+
+radix_nginx_user: radix_nginx_user
+radix_nginx_passw: radix_ngix_password
+
+radix_rpc: https://betanet.radixdlt.com/rpc

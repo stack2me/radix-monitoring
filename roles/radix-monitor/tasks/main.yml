@@ -1,0 +1,27 @@
+---
+- name: Create radix group
+  group:
+    name: "{{ rx_group }}"
+    state: present
+
+- name: Create ton user
+  user:
+    shell: "/bin/bash"
+    name: "{{ rx_user }}"
+    group: "{{ rx_group }}"
+
+- name: Install monitoring_script
+  template:
+    src: "get_metrics.sh.j2"
+    dest: "/usr/local/sbin/get_metrics.sh"
+    owner: "{{ rx_user }}"
+    group: "{{ rx_group }}"
+    mode: "0755"
+
+- name: Cronjob for monitoring script
+  cron:
+    name: "monitoring script"
+    minute: "*/1"
+    cron_file: rx_monitor
+    user: "{{rx_user}}"
+    job: "/usr/local/sbin/get_metrics.sh"

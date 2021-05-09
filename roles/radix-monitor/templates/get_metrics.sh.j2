@@ -1,0 +1,39 @@
+#!/bin/bash
+
+curl -s -u {{ radix_nginx_user }}:{{ radix_nginx_passw }} -k --location --request POST 'https://localhost/node/validator' | jq '.validator.address' > /tmp/radix.key
+
+CURRENT_VAL=`curl -s -u {{ radix_nginx_user }}:{{ radix_nginx_passw }} -k --location --request GET 'https://localhost/system/epochproof' | jq '.sigs' | grep \`cat /tmp/radix.key\``
+echo "$CURRENT_VAL"
+TOTAL_NEXT_VAL=`curl -s -u {{ radix_nginx_user }}:{{ radix_nginx_passw }} -k --location --request GET 'https://localhost/system/epochproof' | jq '.header.nextValidators' | jq length `
+NEXT_VAL=`curl -s -u {{ radix_nginx_user }}:{{ radix_nginx_passw }} -k --location --request GET 'https://localhost/system/epochproof' | jq '.header.nextValidators' | grep \`cat /tmp/radix.key\``
+TOTAL_CUR_VAL=`curl -s -u {{ radix_nginx_user }}:{{ radix_nginx_passw }} -k --location --request GET 'https://localhost/system/epochproof' | jq '.sigs' | jq length`
+DIFF=`curl -s -u {{ radix_nginx_user }}:{{ radix_nginx_passw }} -k --location --request GET 'https://localhost/system/info' | jq '.info.counters.sync.target_current_diff'`
+EPOCH_PROGRESS=`curl -s -u {{ radix_nginx_user }}:{{ radix_nginx_passw }} -k --location --request GET 'https://localhost/system/info' | jq '.info.epochManager.currentView.view'`
+EPOCH_NUM=`curl -s -u {{ radix_nginx_user }}:{{ radix_nginx_passw }} -k --location --request GET 'https://localhost/system/info' | jq '.info.epochManager.currentView.epoch'`
+EPOCH_SIGN=`curl -s -u {{ radix_nginx_user }}:{{ radix_nginx_passw }} -k --location --request GET 'https://localhost/system/info' | jq '.info.counters.signatures.signed'`
+TPS=`curl --header "Content-Type: application/json" --request POST '{{ radix_rpc }}' --data '{"jsonrpc": "2.0","method": "radix.networkTransactionThroughput", "params":[],"id": 1}' | jq '.result.tps'`
+TPS_MEM=`curl --header "Content-Type: application/json" --request POST '{{ radix_rpc }}' --data '{"jsonrpc": "2.0","method": "radix.networkTransactionDemand", "params":[],"id": 1}' | jq '.result.tps'`
+
+
+if [ -n "$CURRENT_VAL" ];
+then
+    echo "rx_validator 1">{{ node_exporter_custom_metrics_folder }}/radix.prom
+else
+    echo "rx_validator 0">{{ node_exporter_custom_metrics_folder }}/radix.prom
+fi
+
+if [ -n "$NEXT_VAL" ];
+then
+    echo "rx_validator_next 1">>{{ node_exporter_custom_metrics_folder }}/radix.prom
+else
+    echo "rx_validator_next 0">>{{ node_exporter_custom_metrics_folder }}/radix.prom
+fi
+
+echo "rx_total_next_validators $TOTAL_NEXT_VAL">>{{ node_exporter_custom_metrics_folder }}/radix.prom
+echo "rx_total_current_validators $TOTAL_CUR_VAL">>{{ node_exporter_custom_metrics_folder }}/radix.prom
+echo "rx_epoch_progress $EPOCH_PROGRESS">>{{ node_exporter_custom_metrics_folder }}/radix.prom
+echo "rx_epoch_num $EPOCH_NUM">>{{ node_exporter_custom_metrics_folder }}/radix.prom
+echo "rx_epoch_sign $EPOCH_SIGN">>{{ node_exporter_custom_metrics_folder }}/radix.prom
+echo "rx_tps $TPS">>{{ node_exporter_custom_metrics_folder }}/radix.prom
+echo "rx_tps_mem $TPS_MEM">>{{ node_exporter_custom_metrics_folder }}/radix.prom
+echo "rx_diff $DIFF">>{{ node_exporter_custom_metrics_folder }}/radix.prom

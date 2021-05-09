@@ -1,0 +1,10 @@
+- name: radix
+  hosts: radix_host
+  become: yes
+  gather_facts: yes
+  roles:
+    - role: common
+    - role: prometheus-node-exporter
+    - role: radix-monitor
+  vars_files:
+    - vars/variables.yml

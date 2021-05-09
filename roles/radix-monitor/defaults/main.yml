@@ -1,0 +1,5 @@
+---
+# defaults file for radix-monitor
+node_exporter_custom_metrics_folder: /var/lib/node_exporter/textfile_collector
+rx_group: radixdlt
+rx_user: radixdlt
