@@ -38,7 +38,7 @@ Roles of Ansible for monitor Radix node.
 - **rx_epoch_num** - epoch number
 - **rx_epoch_sign** - node epoch signs
 - **rx_tps** - network tps
-- **rx_tps_mem** - netwotk tps mem
+- **rx_tps_mem** - network tps mem
 - **rx_diff** - node diff
 
 
