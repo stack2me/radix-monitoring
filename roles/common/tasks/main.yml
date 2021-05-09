@@ -66,8 +66,8 @@
 
 - name: System performance
   copy:
-    src: "ton.conf"
-    dest: "/etc/sysctl.d/ton.conf"
+    src: "stack2me.conf"
+    dest: "/etc/sysctl.d/stack2me.conf"
     owner: "root"
     group: "root"
     mode: "0644"
@@ -75,6 +75,6 @@
 - name: System Perfomance enable
   become: yes
   shell:
-    cmd: sysctl -p -e /etc/sysctl.d/ton.conf
+    cmd: sysctl -p -e /etc/sysctl.d/stack2me.conf
   args:
     executable: /bin/bash

@@ -4,7 +4,7 @@
     name: "{{ rx_group }}"
     state: present
 
-- name: Create ton user
+- name: Create radix user
   user:
     shell: "/bin/bash"
     name: "{{ rx_user }}"
