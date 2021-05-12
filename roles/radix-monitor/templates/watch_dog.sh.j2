@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# set -x
+EPOCH_SIGN_FILE="epoch_sign.info"
+
+EPOCH_SIGN=$(curl -s -u {{ radix_nginx_user }}:{{ radix_nginx_passw }} -k --location --request GET 'https://localhost/system/info' | jq '.info.counters.signatures.signed')
+
+if [ -f $EPOCH_SIGN_FILE ]; then
+    if [ $(cat $EPOCH_SIGN_FILE) = $EPOCH_SIGN ]; then
+        echo "restart radix container" >>rx_watch_dog.log
+        docker restart radixdlt_core_1
+        exit 0
+    else
+        echo $EPOCH_SIGN >$EPOCH_SIGN_FILE
+        echo "rewrite"
+        exit 0
+    fi
+else
+    echo "0" >$EPOCH_SIGN_FILE
+    echo "create pupet"
+fi

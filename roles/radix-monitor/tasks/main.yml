@@ -25,3 +25,19 @@
     cron_file: rx_monitor
     user: "{{rx_user}}"
     job: "/usr/local/sbin/get_metrics.sh"
+
+- name: Install rx_watch_dog
+  template:
+    src: "watch_dog.sh.j2"
+    dest: "/usr/local/sbin/watch_dog.sh"
+    owner: "{{rx_user}}"
+    group: "{{ rx_group }}"
+    mode: "0755"
+
+- name: Cronjob for monitoring script
+  cron:
+    name: "radix watchdog"
+    minute: "*/5"
+    cron_file: rx_watch_dog
+    user: "{{rx_user}}"
+    job: "/usr/local/sbin/watch_dog.sh"
